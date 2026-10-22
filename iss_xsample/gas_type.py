@@ -9,13 +9,14 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import pkg_resources
-from PyQt5 import QtGui, QtWidgets, QtCore, uic
-from PyQt5.Qt import QSplashScreen, QObject
-from PyQt5.QtCore import QSettings, QThread, pyqtSignal, QTimer, QDateTime
-from PyQt5.QtGui import QPixmap
-from PyQt5.Qt import Qt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas, \
+import importlib.resources
+from qtpy import QtGui, QtWidgets, QtCore, uic
+from qtpy.QtWidgets import QSplashScreen
+from qtpy.QtCore import QObject
+from qtpy.QtCore import QSettings, QThread, Signal, QTimer, QDateTime
+from qtpy.QtGui import QPixmap
+from qtpy.QtCore import Qt
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas, \
     NavigationToolbar2QT as NavigationToolbar
 import bluesky.plan_stubs as bps
 
@@ -27,7 +28,7 @@ from datetime import timedelta, datetime
 import time as ttime
 from isstools.dialogs.BasicDialogs import message_box
 
-ui_path = pkg_resources.resource_filename('iss_xsample', 'ui/gas_type.ui')
+ui_path = str(importlib.resources.files('iss_xsample') / 'ui/gas_type.ui')
 
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()

@@ -9,12 +9,13 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import pkg_resources
-from PyQt5 import QtGui, QtWidgets, QtCore, uic
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
+import importlib.resources
+from qtpy import QtGui, QtWidgets, QtCore, uic
+from qtpy.QtCore import QObject, QThread, Signal
 
-from PyQt5.Qt import QSplashScreen, QObject, QTimer
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas, \
+from qtpy.QtWidgets import QSplashScreen
+from qtpy.QtCore import QObject, QTimer
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas, \
     NavigationToolbar2QT as NavigationToolbar
 import bluesky.plan_stubs as bps
 
@@ -28,8 +29,8 @@ import time as ttime
 from isstools.dialogs.BasicDialogs import message_box
 from iss_xsample.gas_type import GasType
 
-ui_path = pkg_resources.resource_filename('iss_xsample', 'ui/xsample_new.ui')
-# ui_path = pkg_resources.resource_filename('iss_xsample', 'ui/xsample_new_tab_version.ui')
+ui_path = str(importlib.resources.files('iss_xsample') / 'ui/xsample_new.ui')
+# ui_path = str(importlib.resources.files('iss_xsample') / 'ui/xsample_new_tab_version.ui')
 
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
@@ -81,7 +82,7 @@ class XsampleGui(*uic.loadUiType(ui_path)):
 
         self.push_clear_program.clicked.connect(self.clear_program)
         self.push_start_program.clicked.connect(self.start_program)
-        self.push_pause_program.setChecked(0)
+        self.push_pause_program.setChecked(False)
         self.push_pause_program.toggled.connect(self.pause_program)
         self.push_stop_program.clicked.connect(self.stop_program)
         self.pushButton_reset_cart.clicked.connect(self.reset_cart_plc)
@@ -314,7 +315,7 @@ class XsampleGui(*uic.loadUiType(ui_path)):
         for i in range(1, 6):
             getattr(self, 'comboBox_gas' + str(i)).setCurrentIndex(0)
             item = QtWidgets.QTableWidgetItem(str(0))
-            item.setCheckState(2)
+            item.setCheckState(QtCore.Qt.Checked)
             self.tableWidget_program.setItem(0, i+2, item)
 
         self.current_sample_env.ramp_stop()
@@ -411,9 +412,9 @@ class XsampleGui(*uic.loadUiType(ui_path)):
                 print(direction, type(direction))
                 if type(direction) is str:
                     if direction == 'reactor':
-                        item.setCheckState(2)
+                        item.setCheckState(QtCore.Qt.Checked)
                     else:
-                        item.setCheckState(0)
+                        item.setCheckState(QtCore.Qt.Unchecked)
                 self.tableWidget_program.setItem(i, step - 1, item)
 
     def init_table_widget(self):
@@ -439,7 +440,7 @@ class XsampleGui(*uic.loadUiType(ui_path)):
                 flow_rate = self.tableWidget_program.item(_row, _column)
                 if not flow_rate:
                     item = QtWidgets.QTableWidgetItem('0')
-                    item.setCheckState(2)
+                    item.setCheckState(QtCore.Qt.Checked)
                     self.tableWidget_program.setItem(_row, _column, item)
 
 
@@ -522,7 +523,7 @@ class XsampleGui(*uic.loadUiType(ui_path)):
                 flag = False
             if flag == False:
                 item = QtWidgets.QTableWidgetItem('0')
-                item.setCheckState(2)
+                item.setCheckState(QtCore.Qt.Checked)
                 self.tableWidget_program.setItem(row, column, item)
             if flag == True:
                 for j in range(self.spinBox_steps.value()):
@@ -535,7 +536,7 @@ class XsampleGui(*uic.loadUiType(ui_path)):
                             _is_empty = True
                         if _is_empty:
                             item = QtWidgets.QTableWidgetItem('0')
-                            item.setCheckState(2)
+                            item.setCheckState(QtCore.Qt.Checked)
                             self.tableWidget_program.setItem(row, j, item)
 
 
@@ -604,7 +605,7 @@ class XsampleGui(*uic.loadUiType(ui_path)):
                     # ch = check_status_of_radioButton(j - 2)
                     self.process_program_steps[col][gas_key]['source'] = getattr(self, f'comboBox_source_of_gas{j - 2}').currentText()
                     self.process_program_steps[col][gas_key]['name'] = getattr(self, f'comboBox_gas{j - 2}').currentText()
-                    self.process_program_steps[col][gas_key]['to_reactor'] = _tmp[gas_key].checkState() == 2
+                    self.process_program_steps[col][gas_key]['to_reactor'] = _tmp[gas_key].checkState() == QtCore.Qt.Checked
                     try:
                         _value = float(_tmp[gas_key].text())
                         self.process_program_steps[col][gas_key]['flow'] = float(_tmp[gas_key].text())
@@ -1201,7 +1202,7 @@ class TempRampManager(object):
 
 
 class ArchiverReader(QObject):
-    finished = pyqtSignal()
+    finished = Signal()
 
     def __init__(self, archiver, timewindow, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1227,4 +1228,4 @@ if __name__ == '__main__':
     main = GUI()
     main.show()
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

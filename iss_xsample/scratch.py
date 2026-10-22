@@ -389,7 +389,7 @@ for k  in flows.keys():
     plt.legend()
 
 
-from PyQt5 import QtGui, QtWidgets, QtCore, uic
+from qtpy import QtGui, QtWidgets, QtCore, uic
 for step in range(1, no_of_steps + 1):
     for i, value in enumerate(_df[step]):
         item = QtWidgets.QTableWidgetItem(str(value))
