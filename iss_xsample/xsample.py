@@ -721,7 +721,7 @@ class XsampleGui(*uic.loadUiType(ui_path)):
 
             # Check if the setpoints and readbacks are close
             status_label = getattr(self, f'label_cart_mfc{indx + 1}_status')
-            rb = float(re.findall('\d*\.?\d+', rb)[0])
+            rb = float(re.findall(r'\d*\.?\d+', rb)[0])
             if sp > 0:
                 error = np.abs((rb - sp) / sp)
                 if error > 0.1:

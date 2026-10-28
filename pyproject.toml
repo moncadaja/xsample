@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling>=1.27.0", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "iss-xsample"
+description = "Sample-environment (gas handling, temperature program, RGA) GUI for the ISS beamline"
+readme = "README.rst"
+authors = [{ name = "Brookhaven National Laboratory" }]
+license = { text = "BSD-3-Clause" }
+requires-python = ">=3.11,<3.14"
+# qtpy needs a Qt binding at runtime (PyQt6 at ISS); install it through conda/pixi.
+dependencies = [
+    "qtpy>=2.4",
+    "numpy",
+    "pandas>=2",
+    "matplotlib>=3.8",
+    "pytz",
+    "requests",
+    "openpyxl",       # treatment programs are saved/loaded as .xlsx
+    "bluesky",
+    "isstools",       # figure_update helpers and dialogs
+]
+classifiers = [
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = ["pytest>=8", "pytest-qt"]
+
+[tool.hatch]
+version.source = "vcs"
+build.hooks.vcs.version-file = "iss_xsample/_version.py"
+
+[tool.hatch.version.raw-options]
+local_scheme = "node-and-date"
+fallback_version = "0.0.0"
+
+[tool.hatch.build.targets.wheel]
+packages = ["iss_xsample"]
